@@ -1,0 +1,62 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    name: Build for Python
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.7
+          - 3.8
+          - 3.9
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: "Install dependencies"
+        run: |
+          # Update "pip" to the newest version
+          python -m pip install --upgrade pip
+
+          # Install flake8 and pytest
+          pip install flake8 pytest
+
+          # If there is a "requirements.txt" file, then install everything from it, otherwise do nothing else.
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+  deploy_source:
+    needs: build
+    name: Deploy lambda from source
+    runs-on: ubuntu-latest
+    steps:
+      # Configure the AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      # deploy the new lambda function
+      - name: checkout source code
+        uses: actions/checkout@v2
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: autoDeployedFromGithub
+          source: lambda_function.py

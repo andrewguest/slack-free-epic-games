@@ -1,30 +1,57 @@
 import os
-import sys
 
-from dhooks import Webhook, Embed
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 from utils.epic import get_free_epic_games
-from utils.sanity_check import safe_to_post
 
 
-hook = Webhook(os.environ['free_games_discord_webhook'])
+slack_client = WebClient(token=os.getenv("SLACK_TOKEN"))
 free_epic_games = get_free_epic_games()
 
-if safe_to_post() == False:
-    sys.exit("Not good to post")
-else:
-    last_games_posted = safe_to_post()
-    epic_list = [game.title for game in free_epic_games]
-    if sorted(last_games_posted) == sorted(epic_list):
-        sys.exit("These games have already been posted. Exiting")
-    else:
-        for entry in free_epic_games:
-            data = Embed(
-                title=entry.title,
-                description=entry.store_link,
-                image_url=entry.image_url
-            )
-            data.set_author(name="FreeGamesBot", icon_url="https://img.icons8.com/fluency/96/000000/xbox-controller.png")
-            hook.send(embed=data)
-            with open("posted_games.txt", "a") as log_file:
-                log_file.write(entry.title + "\n")
+epic_games_list = [game.title for game in free_epic_games]
+
+for entry in free_epic_games:
+    game_blocks = [
+        {
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": f"*{entry.title}*"
+			},
+			"accessory": {
+				"type": "image",
+				"image_url": f"{entry.image_url}",
+				"alt_text": f"{entry.title}"
+			}
+		},
+		{
+			"type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": f"{entry.store_link}"
+            },
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "Epic store link"
+				},
+				"value": "click_me_123",
+				"url": f"{entry.store_link}",
+				"action_id": "button-action"
+			}
+		},
+		{
+			"type": "divider"
+		}
+    ]
+
+    try:
+        slack_client.chat_postMessage(
+            channel = str(os.getenv("SLACK_CHANNEL_TOKEN")),  # get this from an env variable
+            blocks = game_blocks
+        )
+    except SlackApiError as e:
+        assert e.response["error"]
+

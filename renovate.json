@@ -1,6 +1,0 @@
-{
-  "extends": [
-    "config:base",
-    "github>andrewguest/renovatebot-presets"
-  ]
-}
