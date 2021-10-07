@@ -23,7 +23,7 @@ This is a simple project that runs a script to check the Epic game store for thi
 2. **Runtime**: Python 3.9 (latest at the time of writing)
 3. **Architecture**: x86_64
 
-![AWS Lambda setup screen](images/aws-lambda-setup-screen.png)
+![AWS Lambda setup screen](images/aws-lambda-setup-screen.PNG)
 
 ### 4) Add environment variables to AWS Lambda
 #### Slack Token
@@ -42,7 +42,7 @@ You can get your channel ID by opening the Slack desktop client, going to the wo
 4. **Value**: `<your slack channel ID>`
 5. Click **Save**
 
-![AWS Lambda environment variable screen](images/aws-lambda-environment-variable-screen.png)
+![AWS Lambda environment variable screen](images/aws-lambda-environment-variable-screen.PNG)
 
 #### Setup automatic deployment from Github to AWS Lambda
 https://blog.jakoblind.no/aws-lambda-github-actions
