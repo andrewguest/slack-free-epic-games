@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Mapping
 
 import httpx
 from slack_sdk import WebClient
@@ -63,45 +63,51 @@ def lambda_handler(event, context):
 
 	for entry in free_epic_games:
 		game_blocks = [
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": f"*{entry.title}*"
-				},
-				"accessory": {
-					"type": "image",
-					"image_url": f"{entry.image_url}",
-					"alt_text": f"{entry.title}"
-				}
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": f"{entry.title}"
+			}
+		},
+		{
+			"type": "image",
+			"title": {
+				"type": "plain_text",
+				"text": f"{entry.title}"
 			},
-			{
-				"type": "section",
-				"text": {
-					"type": "plain_text",
-					"text": f"{entry.store_link}"
-				},
-				"accessory": {
+			"image_url": f"{entry.image_url}",
+			"alt_text": f"{entry.title}"
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
 					"type": "button",
 					"text": {
 						"type": "plain_text",
-						"text": "Epic store link"
+						"text": "Click Me"
 					},
 					"value": "click_me_123",
 					"url": f"{entry.store_link}",
 					"action_id": "button-action"
 				}
-			},
-			{
-				"type": "divider"
-			}
-		]
+			]
+		},
+		{
+			"type": "divider"
+		}
+	]
+
+		print(game_blocks)
 
 		try:
 			slack_client.chat_postMessage(
-				channel = str(os.getenv("SLACK_CHANNEL_TOKEN")),  # get this from an env variable
-				blocks = game_blocks
+				channel = str(os.getenv("SLACK_CHANNEL_ID")),  # get this from an env variable
+    			blocks = game_blocks
 			)
 		except SlackApiError as e:
 			assert e.response["error"]
 
+if __name__ == "__main__":
+	lambda_handler("", "")
