@@ -58,5 +58,5 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
-          function_name: autoDeployedFromGithub
+          function_name: https://blog.jakoblind.no/aws-lambda-github-actions/
           source: lambda_function.py
