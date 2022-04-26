@@ -57,7 +57,7 @@ jobs:
           # If there is a "requirements.txt" file, then install everything from it, otherwise do nothing else.
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Create zip file
-        uses: montudor/action-zip@1.0.0
+        uses: montudor/action-zip@v1.0.0
         with:
           args: zip -qq -r ./bundle.zip ./
       - name: Default deploy
